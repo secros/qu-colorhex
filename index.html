@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Color Hex & RGB Converter – Convert HEX, RGB, HSL Colors</title>
+  <meta name="description" content="Free color converter. Convert between HEX, RGB, HSL, and CMYK color formats instantly. Includes color picker and preview." />
+  <meta name="keywords" content="hex to rgb, rgb to hex, color converter, hex color converter, rgb to hsl, color picker, css color converter" />
+  <link rel="canonical" href="https://colorhex.quickutils.tools/" />
+  <meta property="og:title" content="Color Hex & RGB Converter" />
+  <meta property="og:description" content="Convert between HEX, RGB, HSL and CMYK color formats instantly. Free color picker included." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://colorhex.quickutils.tools/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8872742474601337" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #FAFAFA; --white: #FFFFFF; --border: #E4E4E7;
+      --ink: #09090B; --ink-mid: #3F3F46; --ink-light: #71717A;
+      --radius: 8px; --radius-lg: 14px;
+      --preview: #6366F1;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+    .ad-banner-top { background: var(--white); border-bottom: 1px solid var(--border); text-align: center; padding: 8px 16px; font-size: 11px; color: var(--ink-light); letter-spacing: .08em; text-transform: uppercase; }
+    header { background: var(--ink); color: white; padding: 52px 24px 44px; text-align: center; }
+    .header-eyebrow { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #A5B4FC; margin-bottom: 16px; }
+    header h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 600; line-height: 1.1; margin-bottom: 14px; }
+    header h1 em { font-style: normal; color: #A5B4FC; }
+    header p { font-size: 1rem; color: #71717A; max-width: 420px; margin: 0 auto; font-weight: 300; }
+    main { max-width: 680px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    /* COLOR PREVIEW */
+    .preview-card { border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+    .color-swatch { height: 160px; background: var(--preview); transition: background .1s; position: relative; }
+    .color-picker-overlay { position: absolute; top: 12px; right: 12px; }
+    .color-picker-overlay input[type="color"] { width: 40px; height: 40px; border: none; border-radius: 50%; cursor: pointer; background: transparent; padding: 0; }
+    .preview-info { background: var(--white); border: 1px solid var(--border); border-top: none; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .preview-hex { font-family: 'DM Mono', monospace; font-size: 1.3rem; font-weight: 700; color: var(--ink); letter-spacing: .05em; }
+    .preview-name { font-size: 13px; color: var(--ink-light); }
+    .copy-hex-btn { padding: 6px 14px; background: transparent; border: 1px solid var(--border); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--ink-light); cursor: pointer; transition: all .12s; }
+    .copy-hex-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .copy-hex-btn.copied { border-color: #059669; color: #059669; }
+
+    /* FORMAT CARDS */
+    .formats-grid { display: grid; gap: 10px; margin-bottom: 16px; }
+    .format-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 20px; }
+    .format-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .format-label { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-light); }
+    .format-copy { padding: 4px 10px; background: transparent; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; color: var(--ink-light); cursor: pointer; transition: all .12s; }
+    .format-copy:hover { border-color: var(--ink); color: var(--ink); }
+    .format-copy.copied { border-color: #059669; color: #059669; }
+    .format-inputs { display: flex; gap: 8px; }
+    .format-input-group { flex: 1; }
+    .format-input-group label { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-light); display: block; margin-bottom: 4px; }
+    .format-input-group input { width: 100%; padding: 8px 10px; font-family: 'DM Mono', monospace; font-size: .95rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--ink); outline: none; transition: border-color .15s; }
+    .format-input-group input:focus { border-color: #6366F1; }
+
+    /* HEX INPUT */
+    .hex-input-wrap { display: flex; align-items: center; gap: 8px; }
+    .hex-prefix { font-family: 'DM Mono', monospace; font-size: 1.1rem; color: var(--ink-light); }
+    .hex-input-wrap input { flex: 1; padding: 8px 10px; font-family: 'DM Mono', monospace; font-size: 1.1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--ink); outline: none; transition: border-color .15s; letter-spacing: .05em; }
+    .hex-input-wrap input:focus { border-color: #6366F1; }
+
+    /* QUICK COLORS */
+    .swatches-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; }
+    .swatches-label { font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 12px; }
+    .swatches-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .swatch { width: 36px; height: 36px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: transform .12s, border-color .12s; }
+    .swatch:hover { transform: scale(1.1); border-color: var(--ink); }
+
+    /* SHARE */
+    .utility-bar { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .utility-bar-label { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-light); width: 100%; margin-bottom: 4px; }
+    .share-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; border: 1px solid var(--border); text-decoration: none; transition: opacity .15s, transform .1s; color: white; }
+    .share-btn:hover { opacity: .85; transform: translateY(-1px); }
+    .share-btn.tw { background: #000; border-color: #000; }
+    .share-btn.fb { background: #1877F2; border-color: #1877F2; }
+    .share-btn.wa { background: #25D366; border-color: #25D366; color: #000; }
+    .share-btn.rd { background: #FF4500; border-color: #FF4500; }
+    .share-btn.cl { background: transparent; color: var(--ink-light); border-color: var(--border); }
+    .share-btn.cl.copied { border-color: #059669; color: #059669; }
+    .bookmark-tip { width: 100%; font-size: 12px; color: var(--ink-light); margin-top: 4px; }
+    .bookmark-tip kbd { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 6px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink); }
+
+    .related-section { margin-bottom: 16px; }
+    .related-section h2 { font-size: 1rem; font-weight: 600; color: var(--ink); margin-bottom: 14px; }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+    .related-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; text-decoration: none; display: block; transition: border-color .15s; }
+    .related-card:hover { border-color: #6366F1; }
+    .related-card-emoji { font-size: 1.3rem; margin-bottom: 6px; }
+    .related-card-title { font-size: .85rem; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+    .related-card-desc { font-size: 11px; color: var(--ink-light); }
+
+    .embed-section { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+    .embed-section h3 { font-size: 11px; color: var(--ink-light); margin-bottom: 10px; letter-spacing: .05em; text-transform: uppercase; }
+    .embed-code { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink-light); word-break: break-all; margin-bottom: 10px; line-height: 1.6; }
+    .embed-copy-btn { padding: 7px 16px; background: transparent; border: 1px solid var(--border); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--ink-light); cursor: pointer; transition: all .12s; }
+    .embed-copy-btn:hover { border-color: #6366F1; color: #6366F1; }
+    .embed-copy-btn.copied { border-color: #059669; color: #059669; }
+
+    .ad-inline { background: var(--bg); border: 1px dashed var(--border); border-radius: var(--radius-lg); padding: 16px; text-align: center; color: var(--ink-light); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; min-height: 90px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+
+    .content-section { margin-bottom: 16px; }
+    .content-section h2 { font-size: 1.2rem; font-weight: 600; color: var(--ink); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    .faq-item { margin-bottom: 20px; }
+    .faq-item h3 { font-size: 1rem; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+    .faq-item p { font-size: .9rem; color: var(--ink-light); margin: 0; line-height: 1.65; }
+    code { font-family: 'DM Mono', monospace; background: var(--bg); border: 1px solid var(--border); padding: 2px 6px; border-radius: 3px; font-size: .9em; }
+
+    footer { background: var(--ink); color: #52525B; text-align: center; padding: 32px 24px; font-size: 13px; margin-top: 48px; }
+    footer a { color: #A5B4FC; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    footer .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="ad-banner-top">Advertisement</div>
+  <header>
+    <p class="header-eyebrow">Free Design Tool</p>
+    <h1>Color <em>Hex & RGB</em><br>Converter</h1>
+    <p>Convert between HEX, RGB, HSL and CMYK instantly. Pick any color and get all formats at once.</p>
+  </header>
+  <main>
+
+    <!-- COLOR PREVIEW -->
+    <div class="preview-card">
+      <div class="color-swatch" id="color-swatch">
+        <div class="color-picker-overlay">
+          <input type="color" id="color-picker" value="#6366F1" oninput="fromPicker(this.value)" title="Pick a color" />
+        </div>
+      </div>
+      <div class="preview-info">
+        <div>
+          <div class="preview-hex" id="preview-hex">#6366F1</div>
+          <div class="preview-name" id="preview-rgb">rgb(99, 102, 241)</div>
+        </div>
+        <button class="copy-hex-btn" id="copy-hex-btn" onclick="copyHex()">Copy HEX</button>
+      </div>
+    </div>
+
+    <!-- FORMAT CARDS -->
+    <div class="formats-grid">
+
+      <!-- HEX -->
+      <div class="format-card">
+        <div class="format-header">
+          <span class="format-label">HEX</span>
+          <button class="format-copy" onclick="copyFormat('hex-val', this)">Copy</button>
+        </div>
+        <div class="hex-input-wrap">
+          <span class="hex-prefix">#</span>
+          <input type="text" id="hex-input" value="6366F1" maxlength="6" oninput="fromHex(this.value)" placeholder="6366F1" />
+        </div>
+        <input type="hidden" id="hex-val" value="#6366F1" />
+      </div>
+
+      <!-- RGB -->
+      <div class="format-card">
+        <div class="format-header">
+          <span class="format-label">RGB</span>
+          <button class="format-copy" onclick="copyFormat('rgb-val', this)">Copy</button>
+        </div>
+        <div class="format-inputs">
+          <div class="format-input-group"><label>R</label><input type="number" id="rgb-r" min="0" max="255" value="99" oninput="fromRGB()" /></div>
+          <div class="format-input-group"><label>G</label><input type="number" id="rgb-g" min="0" max="255" value="102" oninput="fromRGB()" /></div>
+          <div class="format-input-group"><label>B</label><input type="number" id="rgb-b" min="0" max="255" value="241" oninput="fromRGB()" /></div>
+        </div>
+        <input type="hidden" id="rgb-val" value="rgb(99, 102, 241)" />
+      </div>
+
+      <!-- HSL -->
+      <div class="format-card">
+        <div class="format-header">
+          <span class="format-label">HSL</span>
+          <button class="format-copy" onclick="copyFormat('hsl-val', this)">Copy</button>
+        </div>
+        <div class="format-inputs">
+          <div class="format-input-group"><label>H °</label><input type="number" id="hsl-h" min="0" max="360" value="239" oninput="fromHSL()" /></div>
+          <div class="format-input-group"><label>S %</label><input type="number" id="hsl-s" min="0" max="100" value="84" oninput="fromHSL()" /></div>
+          <div class="format-input-group"><label>L %</label><input type="number" id="hsl-l" min="0" max="100" value="67" oninput="fromHSL()" /></div>
+        </div>
+        <input type="hidden" id="hsl-val" value="hsl(239, 84%, 67%)" />
+      </div>
+
+      <!-- CMYK -->
+      <div class="format-card">
+        <div class="format-header">
+          <span class="format-label">CMYK</span>
+          <button class="format-copy" onclick="copyFormat('cmyk-val', this)">Copy</button>
+        </div>
+        <div class="format-inputs">
+          <div class="format-input-group"><label>C %</label><input type="number" id="cmyk-c" min="0" max="100" readonly /></div>
+          <div class="format-input-group"><label>M %</label><input type="number" id="cmyk-m" min="0" max="100" readonly /></div>
+          <div class="format-input-group"><label>Y %</label><input type="number" id="cmyk-y" min="0" max="100" readonly /></div>
+          <div class="format-input-group"><label>K %</label><input type="number" id="cmyk-k" min="0" max="100" readonly /></div>
+        </div>
+        <input type="hidden" id="cmyk-val" />
+      </div>
+
+    </div>
+
+    <!-- QUICK SWATCHES -->
+    <div class="swatches-card">
+      <div class="swatches-label">Quick colors</div>
+      <div class="swatches-grid" id="swatches-grid"></div>
+    </div>
+
+    <!-- SHARE -->
+    <div class="utility-bar">
+      <span class="utility-bar-label">Share this tool:</span>
+      <a class="share-btn tw" id="sh-tw" href="#" target="_blank" rel="noopener">𝕏 Twitter</a>
+      <a class="share-btn fb" id="sh-fb" href="#" target="_blank" rel="noopener">Facebook</a>
+      <a class="share-btn wa" id="sh-wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      <a class="share-btn rd" id="sh-rd" href="#" target="_blank" rel="noopener">Reddit</a>
+      <button class="share-btn cl" id="sh-cl" onclick="copyLink()">Copy link</button>
+      <div class="bookmark-tip" id="bookmark-text">Press <kbd>Ctrl+D</kbd> to bookmark this tool.</div>
+    </div>
+
+    <div class="related-section">
+      <h2>More free tools</h2>
+      <div class="related-grid" id="related-tools-grid"></div>
+    </div>
+
+    <div class="embed-section">
+      <h3>Embed this tool on your site</h3>
+      <p style="font-size:12px;color:var(--ink-light);margin-bottom:10px;">Free to embed. Includes a "Powered by quickutils.tools" link.</p>
+      <div class="embed-code">&lt;iframe src="https://colorhex.quickutils.tools/?embed=1" width="100%" height="600" frameborder="0" title="Color Hex RGB Converter — quickutils.tools"&gt;&lt;/iframe&gt;</div>
+      <button class="embed-copy-btn" onclick="copyEmbed(this)">Copy embed code</button>
+    </div>
+
+    <div class="ad-inline">Advertisement · 728×90</div>
+
+    <div class="content-section">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <h3>How do I convert HEX to RGB?</h3>
+        <p>Split the hex code into three pairs and convert each from base 16 to base 10. For example, <code>#FF5733</code>: FF = 255, 57 = 87, 33 = 51, giving <code>rgb(255, 87, 51)</code>. This tool does it instantly.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is the difference between HEX and RGB?</h3>
+        <p>Both represent the same colors — HEX is a base-16 representation commonly used in CSS and web design, while RGB (Red, Green, Blue) uses decimal values from 0–255. They are mathematically equivalent.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is HSL?</h3>
+        <p>HSL stands for Hue, Saturation, Lightness. It's often more intuitive for designers than RGB because you can adjust brightness and color independently. Hue is 0–360°, Saturation and Lightness are 0–100%.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is CMYK used for?</h3>
+        <p>CMYK (Cyan, Magenta, Yellow, Key/Black) is the color model used in print. Unlike RGB which adds light, CMYK subtracts it — making it the standard for physical printing. Values shown are approximate conversions.</p>
+      </div>
+    </div>
+
+  </main>
+  <footer>
+    <div class="footer-links">
+      <a href="/about.html">About</a>
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="https://quickutils.tools/contact.html">Contact</a>
+      <a href="https://quickutils.tools">All Tools</a>
+    </div>
+    <p>&copy; 2026 <a href="https://quickutils.tools">quickutils.tools</a> — All conversions happen in your browser. No data stored.</p>
+  </footer>
+
+  <script>
+    const TOOL_URL = 'https://colorhex.quickutils.tools/';
+    const SHARE_MSG = encodeURIComponent('Free color converter — HEX, RGB, HSL, CMYK with color picker: ' + TOOL_URL);
+    const ENC_URL = encodeURIComponent(TOOL_URL);
+
+    const isMac = /mac/i.test(navigator.platform);
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (isIOS) document.getElementById('bookmark-text').innerHTML = '🔖 Tap share (↑) then "Add to Home Screen".';
+    else if (isAndroid) document.getElementById('bookmark-text').innerHTML = '🔖 Tap menu (⋮) then "Add to Home Screen".';
+    else if (isMac) document.getElementById('bookmark-text').innerHTML = 'Press <kbd>Cmd+D</kbd> to bookmark.';
+
+    document.getElementById('sh-tw').href = `https://twitter.com/intent/tweet?text=${SHARE_MSG}`;
+    document.getElementById('sh-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${ENC_URL}`;
+    document.getElementById('sh-wa').href = `https://wa.me/?text=${SHARE_MSG}`;
+    document.getElementById('sh-rd').href = `https://www.reddit.com/submit?url=${ENC_URL}&title=${encodeURIComponent('Free color converter — HEX, RGB, HSL, CMYK')}`;
+
+    function copyLink() {
+      navigator.clipboard.writeText(TOOL_URL).then(() => {
+        const btn = document.getElementById('sh-cl');
+        btn.textContent = '✓ Copied!'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy link'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+    function copyEmbed(btn) {
+      navigator.clipboard.writeText(document.querySelector('.embed-code').textContent).then(() => {
+        btn.textContent = '✓ Copied!'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy embed code'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    // Color math
+    function hexToRgb(hex) {
+      hex = hex.replace('#','');
+      if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+      const n = parseInt(hex, 16);
+      return { r: (n>>16)&255, g: (n>>8)&255, b: n&255 };
+    }
+    function rgbToHex(r,g,b) { return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('').toUpperCase(); }
+    function rgbToHsl(r,g,b) {
+      r/=255; g/=255; b/=255;
+      const max=Math.max(r,g,b), min=Math.min(r,g,b);
+      let h,s,l=(max+min)/2;
+      if (max===min) { h=s=0; } else {
+        const d=max-min; s=l>.5?d/(2-max-min):d/(max+min);
+        switch(max){ case r:h=(g-b)/d+(g<b?6:0);break; case g:h=(b-r)/d+2;break; case b:h=(r-g)/d+4;break; }
+        h/=6;
+      }
+      return { h:Math.round(h*360), s:Math.round(s*100), l:Math.round(l*100) };
+    }
+    function hslToRgb(h,s,l) {
+      h/=360; s/=100; l/=100;
+      let r,g,b;
+      if (s===0) { r=g=b=l; } else {
+        const q=l<.5?l*(1+s):l+s-l*s, p=2*l-q;
+        r=hue(p,q,h+1/3); g=hue(p,q,h); b=hue(p,q,h-1/3);
+      }
+      return { r:Math.round(r*255), g:Math.round(g*255), b:Math.round(b*255) };
+    }
+    function hue(p,q,t) { if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p; }
+    function rgbToCmyk(r,g,b) {
+      r/=255; g/=255; b/=255;
+      const k=1-Math.max(r,g,b);
+      if(k===1) return {c:0,m:0,y:0,k:100};
+      return { c:Math.round((1-r-k)/(1-k)*100), m:Math.round((1-g-k)/(1-k)*100), y:Math.round((1-b-k)/(1-k)*100), k:Math.round(k*100) };
+    }
+
+    function updateAll(r,g,b) {
+      const hex = rgbToHex(r,g,b);
+      const hsl = rgbToHsl(r,g,b);
+      const cmyk = rgbToCmyk(r,g,b);
+
+      document.getElementById('color-swatch').style.background = hex;
+      document.getElementById('color-picker').value = hex;
+      document.getElementById('preview-hex').textContent = hex;
+      document.getElementById('preview-rgb').textContent = `rgb(${r}, ${g}, ${b})`;
+      document.getElementById('hex-input').value = hex.slice(1);
+      document.getElementById('hex-val').value = hex;
+      document.getElementById('rgb-r').value = r;
+      document.getElementById('rgb-g').value = g;
+      document.getElementById('rgb-b').value = b;
+      document.getElementById('rgb-val').value = `rgb(${r}, ${g}, ${b})`;
+      document.getElementById('hsl-h').value = hsl.h;
+      document.getElementById('hsl-s').value = hsl.s;
+      document.getElementById('hsl-l').value = hsl.l;
+      document.getElementById('hsl-val').value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+      document.getElementById('cmyk-c').value = cmyk.c;
+      document.getElementById('cmyk-m').value = cmyk.m;
+      document.getElementById('cmyk-y').value = cmyk.y;
+      document.getElementById('cmyk-k').value = cmyk.k;
+      document.getElementById('cmyk-val').value = `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
+    }
+
+    function fromHex(val) {
+      val = val.replace('#','');
+      if (val.length === 3) val = val.split('').map(c=>c+c).join('');
+      if (val.length !== 6) return;
+      const {r,g,b} = hexToRgb(val);
+      updateAll(r,g,b);
+    }
+    function fromRGB() {
+      const r=parseInt(document.getElementById('rgb-r').value)||0;
+      const g=parseInt(document.getElementById('rgb-g').value)||0;
+      const b=parseInt(document.getElementById('rgb-b').value)||0;
+      updateAll(Math.min(255,r),Math.min(255,g),Math.min(255,b));
+    }
+    function fromHSL() {
+      const h=parseInt(document.getElementById('hsl-h').value)||0;
+      const s=parseInt(document.getElementById('hsl-s').value)||0;
+      const l=parseInt(document.getElementById('hsl-l').value)||0;
+      const {r,g,b} = hslToRgb(h,s,l);
+      updateAll(r,g,b);
+    }
+    function fromPicker(val) { fromHex(val.slice(1)); }
+
+    function copyHex() {
+      navigator.clipboard.writeText(document.getElementById('preview-hex').textContent).then(() => {
+        const btn = document.getElementById('copy-hex-btn');
+        btn.textContent = '✓ Copied!'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy HEX'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+    function copyFormat(id, btn) {
+      navigator.clipboard.writeText(document.getElementById(id).value).then(() => {
+        btn.textContent = '✓'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    // Swatches
+    const swatchColors = ['#EF4444','#F97316','#EAB308','#22C55E','#14B8A6','#3B82F6','#6366F1','#A855F7','#EC4899','#000000','#6B7280','#FFFFFF','#FF5733','#2ECC71','#E74C3C','#3498DB','#F39C12','#1ABC9C','#9B59B6','#34495E'];
+    const grid = document.getElementById('swatches-grid');
+    swatchColors.forEach(c => {
+      const s = document.createElement('div');
+      s.className = 'swatch';
+      s.style.background = c;
+      s.style.border = c === '#FFFFFF' ? '2px solid #E4E4E7' : '2px solid transparent';
+      s.title = c;
+      s.onclick = () => fromHex(c.slice(1));
+      grid.appendChild(s);
+    });
+
+    // Init
+    updateAll(99, 102, 241);
+
+    if (new URLSearchParams(window.location.search).get('embed') === '1') {
+      document.querySelector('.ad-banner-top').style.display = 'none';
+      document.querySelector('header').style.display = 'none';
+      document.querySelector('.related-section') && (document.querySelector('.related-section').style.display = 'none');
+      document.querySelector('.embed-section') && (document.querySelector('.embed-section').style.display = 'none');
+      document.querySelector('.content-section') && (document.querySelector('.content-section').style.display = 'none');
+      document.querySelector('.ad-inline') && (document.querySelector('.ad-inline').style.display = 'none');
+      document.querySelector('footer').innerHTML = '<div style="text-align:center;padding:12px;font-size:12px;font-family:sans-serif;color:#71717A;">Powered by <a href="https://quickutils.tools" target="_blank" style="color:#6366F1;text-decoration:none;font-weight:500;">quickutils.tools</a></div>';
+    }
+  </script>
+  <script src="https://quickutils.tools/tools.js" onload="renderRelatedTools({currentUrl:'https://colorhex.quickutils.tools/'})"></script>
+</body>
+</html>
